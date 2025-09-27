@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head"></head>
+
+<body th:object="${pizza}">
+  <div th:replace="fragments/navbar :: nav"></div>
+  <div class="container mt-5">
+    <section th:if="${pizza != null}">
+      <div class="row">
+        <div class="col-md-4 text-center mb-3">
+          <img th:src="*{image}" alt="Pizza" class="img-fluid rounded" style="max-width: 250px;">
+        </div>
+        <div class="col-md-8">
+          <h2>[[*{name}]]</h2>
+          <h5 class="text-muted mb-3">Ingredienti: [[*{ingredients.toString().replaceAll('[\[\]]','')}]]</h5>
+          <p class="fs-4"><strong>[[*{price}]] €</strong></p>
+          <a th:href="@{/pizzas}" class="btn btn-secondary mt-3">Torna alla lista</a>
+        </div>
+      </div>
+    </section>
+    <section th:if="*{specialOffers != null and !specialOffers.isEmpty()}" class="mt-5">
+      <h3>Offerte disponibili</h3>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Titolo</th>
+            <th>Inizio</th>
+            <th>Fine</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="specialOffer : *{specialOffers}">
+            <td th:text="${specialOffer.title}"></td>
+            <td th:text="${#temporals.format(specialOffer.startDate, 'dd/MM/yyyy')}"></td>
+            <td th:text="${#temporals.format(specialOffer.endDate, 'dd/MM/yyyy')}"></td>
+            <td>
+              <a th:href="@{/special-offers/edit/{id}(id=${specialOffer.id})}"
+                class="btn btn-sm btn-primary">Modifica</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section th:unless="*{specialOffers != null and !specialOffers.isEmpty()}" class="mt-5">
+      <div class="alert alert-info text-center">
+        Nessuna offerta disponibile per questa pizza.
+      </div>
+    </section>
+    <div th:unless="${pizza != null}" class="alert alert-danger text-center">
+      Pizza non trovata.
+    </div>
+  </div>
+  <div th:replace="fragments/scripts :: script"></div>
+</body>
+
+</html>

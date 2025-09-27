@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head"></head>
+
+<body>
+  <div th:replace="fragments/navbar :: nav"></div>
+  <div class="container mt-5">
+
+    <h2 class="mb-4" th:text="${edit} ? 'Modifica Ingrediente' : 'Crea Ingrediente'"></h2>
+
+    <form th:action="${edit} ? @{/ingredients/edit/{id}(id=${ingredient.id})} : @{/ingredients/create}"
+      th:object="${ingredient}" method="post" class="row g-3">
+
+      <div class="col-12">
+        <label for="name" class="form-label">Nome Ingrediente</label>
+        <input type="text" th:field="*{name}" class="form-control" id="name" th:errorClass="is-invalid">
+        <div th:if="${#fields.hasErrors('name')}" class="text-danger small" th:errors="*{name}"></div>
+      </div>
+
+      <div class="col-12">
+        <button type="submit" class="btn btn-success">Salva</button>
+        <a th:href="@{/ingredients}" class="btn btn-secondary ms-2">Annulla</a>
+      </div>
+
+    </form>
+  </div>
+  <div th:replace="fragments/scripts :: script"></div>
+</body>
+
+</html>

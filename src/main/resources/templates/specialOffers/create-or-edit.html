@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head"></head>
+
+<body>
+  <div th:replace="fragments/navbar :: nav"></div>
+  <div class="container mt-5">
+    <h2 class="mb-4">Offerta per "[[${specialOffer.pizza.name}]]"</h2>
+    <form th:action="${edit} ? @{/special-offer/edit/{id}(id=${specialOffer.id})} : @{/special-offers/create}"
+      th:object="${specialOffer}" method="post" class="row g-3">
+      <div class="col-12">
+        <label for="title" class="form-label">Titolo Offerta</label>
+        <input type="text" th:field="*{title}" class="form-control" id="title" th:errorClass="is-invalid">
+        <div th:if="${#fields.hasErrors('title')}" class="text-danger small" th:errors="*{title}"></div>
+      </div>
+      <div class="col-md-6">
+        <label for="startDate" class="form-label">Data Inizio</label>
+        <input type="date" th:field="*{startDate}" class="form-control" id="startDate" th:errorClass="is-invalid">
+        <div th:if="${#fields.hasErrors('startDate')}" class="text-danger small" th:errors="*{startDate}"></div>
+      </div>
+      <div class="col-md-6">
+        <label for="endDate" class="form-label">Data Fine</label>
+        <input type="date" th:field="*{endDate}" class="form-control" id="endDate" th:errorClass="is-invalid">
+        <div th:if="${#fields.hasErrors('endDate')}" class="text-danger small" th:errors="*{endDate}"></div>
+      </div>
+      <div class="col-12">
+        <button type="submit" class="btn btn-success">Salva</button>
+        <a th:href="@{/pizzas}" class="btn btn-secondary ms-2">Annulla</a>
+      </div>
+      <input type="hidden" th:field="*{pizza}" id="hidden-pizza" />
+    </form>
+  </div>
+  <div th:replace="fragments/scripts :: script"></div>
+</body>
+
+</html>
