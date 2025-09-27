@@ -1,12 +1,11 @@
 package org.lessons.java.spring_la_mia_pizzeria_relazioni.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.lessons.java.spring_la_mia_pizzeria_relazioni.model.Pizza;
 import org.lessons.java.spring_la_mia_pizzeria_relazioni.model.SpecialOffer;
 import org.lessons.java.spring_la_mia_pizzeria_relazioni.repository.IngredientRepository;
-import org.lessons.java.spring_la_mia_pizzeria_relazioni.repository.PizzaRepository;
+import org.lessons.java.spring_la_mia_pizzeria_relazioni.service.PizzaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +24,7 @@ import jakarta.validation.Valid;
 public class PizzaController {
 
   @Autowired
-  private PizzaRepository pizzaRepository;
+  private PizzaService pizzaService;
 
   @Autowired
   private IngredientRepository ingredientRepository;
@@ -34,26 +33,28 @@ public class PizzaController {
   public String index(@RequestParam(name = "name", required = false) String name, Model model) {
     List<Pizza> pizzas;
     if (name != null && !name.isBlank()) {
-      pizzas = pizzaRepository.findByNameContainingIgnoreCase(name);
+      pizzas = pizzaService.findByName(name);
     } else
-      pizzas = pizzaRepository.findAll();
+      pizzas = pizzaService.findAll();
 
     model.addAttribute("pizzas", pizzas);
+
     return "pizzas/index";
   }
 
   @GetMapping("/{id}")
   public String show(@PathVariable("id") Integer id, Model model) {
-    Optional<Pizza> pizza = pizzaRepository.findById(id);
-    model.addAttribute("pizza", pizza.orElse(null));
+    model.addAttribute("pizza", pizzaService.findById(id));
+
     return "pizzas/show";
   }
 
   @GetMapping("/create")
   public String create(Model model) {
     model.addAttribute("pizza", new Pizza());
-    model.addAttribute("ingredients", ingredientRepository.findAll()); // lista ingredienti dal DB
+    model.addAttribute("ingredients", ingredientRepository.findAll());
     model.addAttribute("edit", false);
+
     return "pizzas/create-or-edit";
   }
 
@@ -63,19 +64,23 @@ public class PizzaController {
     if (bindingResult.hasErrors()) {
       model.addAttribute("ingredients", ingredientRepository.findAll());
       model.addAttribute("edit", false);
+
       return "pizzas/create-or-edit";
     }
 
-    pizzaRepository.save(formPizza); // Spring mapperà direttamente gli ingredienti scelti
+    pizzaService.create(formPizza);
+
     return "redirect:/pizzas";
   }
 
   @GetMapping("/edit/{id}")
   public String edit(@PathVariable Integer id, Model model) {
-    Pizza pizza = pizzaRepository.findById(id).orElseThrow();
+    Pizza pizza = pizzaService.findById(id);
+
     model.addAttribute("pizza", pizza);
-    model.addAttribute("ingredients", ingredientRepository.findAll()); // lista ingredienti dal DB
+    model.addAttribute("ingredients", ingredientRepository.findAll());
     model.addAttribute("edit", true);
+
     return "pizzas/create-or-edit";
   }
 
@@ -85,16 +90,18 @@ public class PizzaController {
     if (bindingResult.hasErrors()) {
       model.addAttribute("ingredients", ingredientRepository.findAll());
       model.addAttribute("edit", true);
+
       return "pizzas/create-or-edit";
     }
 
-    pizzaRepository.save(formPizza);
+    pizzaService.update(formPizza);
+
     return "redirect:/pizzas/" + formPizza.getId();
   }
 
   @PostMapping("/delete/{id}")
   public String delete(@PathVariable Integer id) {
-    pizzaRepository.deleteById(id);
+    pizzaService.deleteById(id);
 
     return "redirect:/pizzas";
   }
@@ -103,7 +110,7 @@ public class PizzaController {
   public String createSpecialOffer(@PathVariable Integer id, Model model) {
     SpecialOffer specialOffer = new SpecialOffer();
 
-    specialOffer.setPizza(pizzaRepository.findById(id).get());
+    specialOffer.setPizza(pizzaService.findById(id));
 
     model.addAttribute("specialOffer", specialOffer);
 
