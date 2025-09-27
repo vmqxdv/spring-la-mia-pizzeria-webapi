@@ -1,10 +1,8 @@
 package org.lessons.java.spring_la_mia_pizzeria_relazioni.controller;
 
-import java.util.Optional;
-
 import org.lessons.java.spring_la_mia_pizzeria_relazioni.model.Ingredient;
 import org.lessons.java.spring_la_mia_pizzeria_relazioni.model.Pizza;
-import org.lessons.java.spring_la_mia_pizzeria_relazioni.repository.IngredientRepository;
+import org.lessons.java.spring_la_mia_pizzeria_relazioni.service.IngredientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,11 +20,11 @@ import jakarta.validation.Valid;
 public class IngredientController {
 
   @Autowired
-  private IngredientRepository ingredientRepository;
+  private IngredientService ingredientService;
 
   @GetMapping
   public String index(Model model) {
-    model.addAttribute("ingredients", ingredientRepository.findAll());
+    model.addAttribute("ingredients", ingredientService.findAll());
 
     return "ingredients/index";
   }
@@ -44,21 +42,20 @@ public class IngredientController {
     if (bindingResult.hasErrors())
       return "ingredients/create";
 
-    ingredientRepository.save(formIngredient);
+    ingredientService.create(formIngredient);
 
     return "redirect:/ingredients";
   }
 
   @GetMapping("/{id}")
   public String show(@PathVariable("id") Integer id, Model model) {
-    Optional<Ingredient> ingredient = ingredientRepository.findById(id);
-    model.addAttribute("ingredient", ingredient.orElse(null));
+    model.addAttribute("ingredient", ingredientService.getById(id));
     return "ingredients/show";
   }
 
   @GetMapping("/edit/{id}")
   public String edit(@PathVariable Integer id, Model model) {
-    model.addAttribute("ingredient", ingredientRepository.findById(id).get());
+    model.addAttribute("ingredient", ingredientService.getById(id));
     model.addAttribute("edit", true);
 
     return "ingredients/create-or-edit";
@@ -70,20 +67,20 @@ public class IngredientController {
     if (bindingResult.hasErrors())
       return "ingredients/create-or-edit";
 
-    ingredientRepository.save(formIngredient);
+    ingredientService.update(formIngredient);
 
     return "redirect:/ingredients/" + formIngredient.getId();
   }
 
   @PostMapping("/delete/{id}")
   public String delete(@PathVariable Integer id) {
-    Ingredient ingredient = ingredientRepository.findById(id).get();
+    Ingredient ingredient = ingredientService.getById(id);
 
     for (Pizza pizza : ingredient.getPizzas()) {
       pizza.getIngredients().remove(ingredient);
     }
 
-    ingredientRepository.delete(ingredient);
+    ingredientService.delete(ingredient);
 
     return "redirect:/ingredients";
   }

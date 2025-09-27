@@ -44,12 +44,12 @@ public class PizzaService {
     return pizzaRepository.save(pizza);
   }
 
-  public void delete(Pizza pizza) {
-    pizzaRepository.delete(pizza);
-  }
-
   public void deleteById(Integer id) {
     pizzaRepository.deleteById(id);
+  }
+
+  public void delete(Pizza pizza) {
+    deleteById(pizza.getId());
   }
 
   public Boolean existById(Integer id) {
