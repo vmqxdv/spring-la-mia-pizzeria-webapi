@@ -32,8 +32,8 @@ public class PizzaService {
     return pizzaRepository.findByNameContainingIgnoreCase(name);
   }
 
-  public Pizza findById(Integer id) {
-    return pizzaRepository.findById(id).get();
+  public Optional<Pizza> findById(Integer id) {
+    return pizzaRepository.findById(id);
   }
 
   public Pizza create(Pizza pizza) {
